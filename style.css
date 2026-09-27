@@ -1,0 +1,450 @@
+/*
+  Shantanu Kaushal — portfolio stylesheet
+  --------------------------------------
+  Structure of this file:
+    1. Design tokens (custom properties)
+    2. Reset / base element styles
+    3. Layout primitives (header, sections)
+    4. Components (hero, portrait, about, skills, contact)
+    5. Motion + accessibility (reduced-motion, focus-visible)
+    6. Responsive rules (small screens at the bottom, mobile-last)
+
+  Why mobile-last instead of mobile-first: the desktop layout here is
+  the more complex one (asymmetric grid, framed portrait), so it reads
+  better to define that first and then simplify it for small screens,
+  rather than build up complexity from a base case.
+*/
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  /* color: warm charcoal ink instead of pure black, brass as the one
+     accent, moss as a quiet secondary used only for rules/underlines */
+  --ink-950: #14140f;
+  --ink-900: #1d1c16;
+  --ink-800: #262419;
+  --paper-100: #eeeae0;
+  --paper-400: #a39c8c;
+  --brass-500: #c6a254;
+  --brass-400: #d9bb74;
+  --moss-600: #56705a; /* base tone, kept for reference — not used directly on dark bg, fails contrast */
+  --moss-300: #8fb396; /* the one that's actually legible against ink-950 */
+  --rule-color: rgba(238, 234, 224, 0.14);
+
+  /* type */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "IBM Plex Sans", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* a base of 17px rather than the default 16 — the whole scale below
+     is tuned around it, not a leftover from a framework default */
+  --step-0: 1.0625rem;   /* 17px, body */
+  --step-1: 1.1875rem;   /* 19px, lede */
+  --step-2: 1.75rem;     /* 28px, h3 */
+  --step-3: 2.75rem;     /* 44px, h2 */
+  --step-4: clamp(2.75rem, 6vw, 5.25rem); /* hero name */
+
+  --content-max: 68rem;
+  --side-margin: clamp(1.5rem, 5vw, 4.5rem);
+
+  --ease-out-quiet: cubic-bezier(0.16, 0.8, 0.3, 1);
+}
+
+/* ---------- 2. Reset / base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--ink-950);
+  color: var(--paper-100);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+ul,
+dl {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1, h2, h3, p, dt, dd, figure {
+  margin: 0;
+}
+
+/* visible keyboard focus everywhere — no outline: none anywhere below */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--brass-400);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--brass-500);
+  color: var(--ink-950);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: var(--side-margin);
+  top: 1rem;
+}
+
+/* ---------- 3. Layout primitives ---------- */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.75rem var(--side-margin);
+  border-bottom: 1px solid var(--rule-color);
+}
+
+.identity-mark {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--brass-400);
+}
+
+.nav-links {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2.25rem);
+  font-size: 0.9375rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--paper-400);
+  position: relative;
+  padding-bottom: 0.2rem;
+  transition: color 0.25s var(--ease-out-quiet);
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 0%;
+  background: var(--brass-400);
+  transition: width 0.3s var(--ease-out-quiet);
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: var(--paper-100);
+}
+
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after {
+  width: 100%;
+}
+
+main section {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: clamp(3.5rem, 8vw, 6.5rem) var(--side-margin);
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 500;
+  line-height: 1.15;
+  max-width: 22ch;
+  margin-bottom: 2.25rem;
+}
+
+/* ---------- 4a. Hero ---------- */
+.intro-banner {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+  padding-top: clamp(3.5rem, 10vw, 7rem);
+  padding-bottom: clamp(3.5rem, 10vw, 7rem);
+}
+
+.intro-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--moss-300);
+  margin-bottom: 1rem;
+}
+
+.headline-lines {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-4);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.75rem;
+}
+
+.line-reveal {
+  display: block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  animation: reveal-line 0.9s var(--ease-out-quiet) forwards;
+  animation-delay: calc(var(--reveal-order) * 130ms + 120ms);
+}
+
+@keyframes reveal-line {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lede-paragraph {
+  font-size: var(--step-1);
+  color: var(--paper-400);
+  max-width: 46ch;
+  margin-bottom: 2.25rem;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.cta-primary {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-decoration: none;
+  background: var(--brass-500);
+  color: var(--ink-950);
+  padding: 0.8rem 1.4rem;
+  border-radius: 3px 0 3px 0;
+  transition: background 0.25s var(--ease-out-quiet), transform 0.25s var(--ease-out-quiet);
+}
+
+.cta-primary:hover {
+  background: var(--brass-400);
+  transform: translateY(-1px);
+}
+
+.cta-secondary {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--paper-100);
+  border-bottom: 1px solid var(--rule-color);
+  padding-bottom: 0.2rem;
+  transition: border-color 0.25s var(--ease-out-quiet);
+}
+
+.cta-secondary:hover,
+.cta-secondary:focus-visible {
+  border-color: var(--brass-400);
+}
+
+/* ---------- 4b. Portrait ---------- */
+.portrait-frame {
+  justify-self: center;
+  width: min(100%, 17.5rem);
+}
+
+.portrait-photo {
+  position: relative;
+}
+
+.portrait-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--brass-500);
+  border-radius: 4px 0 4px 0;
+  transform: translate(0.9rem, 0.9rem);
+  z-index: 0;
+}
+
+.portrait-image {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 4px 0 4px 0;
+  filter: grayscale(0.85) sepia(0.12) contrast(1.05);
+  border: 1px solid var(--rule-color);
+}
+
+.portrait-caption {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--paper-400);
+  margin-top: 1.15rem;
+  max-width: 22ch;
+}
+
+/* ---------- 4c. About ---------- */
+.about-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.about-copy {
+  color: var(--paper-400);
+  max-width: 42ch;
+}
+
+.about-copy + .about-copy {
+  color: var(--paper-100);
+}
+
+/* ---------- 4d. Skills ---------- */
+.skill-ledger {
+  border-top: 1px solid var(--rule-color);
+}
+
+.skill-entry {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 2rem;
+  padding: 1.6rem 0;
+  border-bottom: 1px solid var(--rule-color);
+}
+
+.skill-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--brass-400);
+}
+
+.skill-detail {
+  color: var(--paper-400);
+  max-width: 48ch;
+  padding-top: 0.2rem;
+}
+
+/* ---------- 4e. Contact ---------- */
+.closing-statement {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--step-3);
+  line-height: 1.2;
+  max-width: 20ch;
+  margin-bottom: 2.5rem;
+}
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+
+.contact-links a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule-color);
+  padding-bottom: 0.2rem;
+  transition: border-color 0.25s var(--ease-out-quiet), color 0.25s var(--ease-out-quiet);
+}
+
+.contact-links a:hover,
+.contact-links a:focus-visible {
+  border-color: var(--brass-400);
+  color: var(--brass-400);
+}
+
+.site-footer {
+  border-top: 1px solid var(--rule-color);
+  padding: 1.75rem var(--side-margin) 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--paper-400);
+}
+
+/* ---------- 5. Motion + accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .line-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cta-primary,
+  .nav-links a,
+  .nav-links a::after,
+  .cta-secondary,
+  .contact-links a {
+    transition: none;
+  }
+}
+
+/* ---------- 6. Responsive ---------- */
+@media (max-width: 860px) {
+  .intro-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .portrait-frame {
+    justify-self: start;
+    order: -1;
+    width: min(60%, 13rem);
+  }
+
+  .about-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-entry {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header {
+    padding: 1.4rem 1.25rem;
+  }
+
+  main section {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+}
